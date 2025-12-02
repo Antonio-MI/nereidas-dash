@@ -1,7 +1,7 @@
 from dash import Dash, dcc, html, Input, Output, State, ctx, no_update
 import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
+import numpy
 
 # --- Definimos propiedades disponibles ---
 propiedades = ['Clorofila', 'OxigenoDisuelto', 'Salinidad', 'Temperatura']
