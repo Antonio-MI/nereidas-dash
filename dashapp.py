@@ -1,7 +1,7 @@
 from dash import Dash, dcc, html, Input, Output, State, ctx, no_update
 import plotly.graph_objects as go
 import pandas as pd
-import numpy
+import numpy as np
 
 # --- Definimos propiedades disponibles ---
 propiedades = ['Clorofila', 'OxigenoDisuelto', 'Salinidad', 'Temperatura']
@@ -31,8 +31,8 @@ def getPlot(boya, group_by_depth=False):
 
     # 1) Añadir todas las trazas (inicialmente invisibles)
     for p in propiedades:
-        # Leemos los csv obtenidos en LecturaDatos.ipynb
-        df = pd.read_csv(f'../boyasRevisadas/{p}_series.csv')
+        # Leemos los csv obtenidos en LecturaDatosTratados.ipynb
+        df = pd.read_csv(f'boyas/{p}_series.csv')
         df['Date'] = pd.to_datetime(df['Date'])
         df = df.sort_values('Date')
         # Interpolación lineal para rellenar NaN
@@ -66,14 +66,14 @@ def getPlot(boya, group_by_depth=False):
             label=p,
             method="update",
             args=[{"visible": visibles},
-                  {"title": f"<b>{boya} data — {p}</b>"}]
+                  {"title": f"<b>{boya} — {p}</b>"}]
         ))
 
     # 3) Layout
     fig.update_layout(
         updatemenus=[dict(buttons=list_buttons, font=dict(size=16))],
         legend=dict(groupclick="toggleitem"),
-        title=f"<b>{boya} data — {p}</b>",
+        title=f"<b>{boya} — {p}</b>",
         xaxis=dict(rangeslider=dict(visible=True), type="date"),
         uirevision="keep",
         height=500,
@@ -90,7 +90,7 @@ def getPlot(boya, group_by_depth=False):
     initial_visible = [prop == first_prop for prop in trace_props]
     for tr, v in zip(fig.data, initial_visible):
         tr.visible = v
-    fig.update_layout(title=f"<b>{boya} data — {first_prop}</b>")
+    fig.update_layout(title=f"<b>{boya} — {first_prop}</b>")
 
     # 5) Línea de media inicial
     ys = []
@@ -115,7 +115,8 @@ def getPlot(boya, group_by_depth=False):
 
 
 # Aplicación Dash
-app = Dash(__name__)
+app = Dash(__name__, requests_pathname_prefix="/visorboyas/")
+app.title = "Visor Boyas"
 
 app.layout = html.Div([
     # Título del layout
@@ -333,5 +334,5 @@ def master_update(chk_group, toggle_second, relayout1, relayout2, restyle1, rest
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host="0.0.0.0", port=8050)
 
