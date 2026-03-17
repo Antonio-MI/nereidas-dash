@@ -115,12 +115,12 @@ def getPlot(boya, group_by_depth=False):
 
 
 # Aplicación Dash
-app = Dash(__name__, requests_pathname_prefix="/visorboyas/")
-app.title = "Visor Boyas"
+app = Dash(__name__, requests_pathname_prefix="/visorcolumnaagua/")
+app.title = "Visor Columna de Agua"
 
 app.layout = html.Div([
     # Título del layout
-    html.H3("Datos de la boyas del Mar Menor"),
+    html.H3("Datos de la columna de agua del Mar Menor"),
 
     # Casilla: agrupar por profundidad
     dcc.Checklist(
@@ -140,8 +140,8 @@ app.layout = html.Div([
 
     # Gráfica 1
     dcc.Graph(
-        id='grafico-boyas-1',
-        figure=getPlot('CTD Agregados', group_by_depth=False),
+        id='grafico-columnaagua-1',
+        figure=getPlot('Datos Agregados', group_by_depth=False),
         style={'height': '500px', 'margin-bottom': '24px'}
     ),
 
@@ -150,28 +150,47 @@ app.layout = html.Div([
         id='wrap-second',
         children=[
             dcc.Graph(
-                id='grafico-boyas-2',
-                figure=getPlot('CTD Agregados', group_by_depth=False),
+                id='grafico-columnaagua-2',
+                figure=getPlot('Datos Agregados', group_by_depth=False),
                 style={'height': '500px'}
             )
         ],
         style={'display': 'none'}
+    ),
+
+    # Pie de página
+    html.Footer(
+        html.P([
+            "The data gathered comes from Polytechnic University of Cartagena (UPCT) at ",
+            html.A("https://marmenor.upct.es/embed/l2", href="https://marmenor.upct.es/embed/l2", target="_blank"),
+            " and Murcian Institute of Agricultural and Environmental Research and Development (IMIDA) at ",
+            html.A("https://idearm.imida.es/cgi/siomctdmarmenor/", href="https://idearm.imida.es/cgi/siomctdmarmenor/", target="_blank"),
+            ". The latter is no longer available due to the end of the project related to that website."
+        ]),
+        style={
+            'marginTop': '32px',
+            'padding': '16px',
+            'borderTop': '1px solid #ccc',
+            'fontSize': '13px',
+            'color': '#666',
+            'textAlign': 'justify'
+        }
     )
 ])
 
 # ---------- ÚNICO callback maestro (sin salidas duplicadas) ----------
 @app.callback(
     Output('wrap-second', 'style'),
-    Output('grafico-boyas-1', 'figure'),
-    Output('grafico-boyas-2', 'figure'),
+    Output('grafico-columnaagua-1', 'figure'),
+    Output('grafico-columnaagua-2', 'figure'),
     Input('chk-group-depth', 'value'),
     Input('toggle-second-graph', 'value'),
-    Input('grafico-boyas-1', 'relayoutData'),
-    Input('grafico-boyas-2', 'relayoutData'),
-    Input('grafico-boyas-1', 'restyleData'),
-    Input('grafico-boyas-2', 'restyleData'),
-    State('grafico-boyas-1', 'figure'),
-    State('grafico-boyas-2', 'figure'),
+    Input('grafico-columnaagua-1', 'relayoutData'),
+    Input('grafico-columnaagua-2', 'relayoutData'),
+    Input('grafico-columnaagua-1', 'restyleData'),
+    Input('grafico-columnaagua-2', 'restyleData'),
+    State('grafico-columnaagua-1', 'figure'),
+    State('grafico-columnaagua-2', 'figure'),
     prevent_initial_call=True
 )
 def master_update(chk_group, toggle_second, relayout1, relayout2, restyle1, restyle2, fig1, fig2):
@@ -190,8 +209,8 @@ def master_update(chk_group, toggle_second, relayout1, relayout2, restyle1, rest
         xr1 = fig1.get('layout', {}).get('xaxis', {}).get('range')
         xr2 = fig2.get('layout', {}).get('xaxis', {}).get('range')
 
-        fig1 = getPlot('CTD Agregados', group_by_depth=grouped).to_dict()
-        fig2 = getPlot('CTD Agregados', group_by_depth=grouped).to_dict()
+        fig1 = getPlot('Datos Agregados', group_by_depth=grouped).to_dict()
+        fig2 = getPlot('Datos Agregados', group_by_depth=grouped).to_dict()
 
         # preservar rangos previos
         if xr1:
@@ -201,7 +220,7 @@ def master_update(chk_group, toggle_second, relayout1, relayout2, restyle1, rest
 
     # --- 3) Si se activó la 2ª gráfica ahora mismo - inicialízala y (opcional) copia rango de la primera
     if trigger == 'toggle-second-graph' and show_second:
-        fig2 = getPlot('CTD Agregados', group_by_depth=grouped).to_dict()
+        fig2 = getPlot('Datos Agregados', group_by_depth=grouped).to_dict()
         xr1 = fig1.get('layout', {}).get('xaxis', {}).get('range')
         if xr1:
             fig2.setdefault('layout', {}).setdefault('xaxis', {})['range'] = xr1
@@ -233,10 +252,10 @@ def master_update(chk_group, toggle_second, relayout1, relayout2, restyle1, rest
     rng1 = extract_range(relayout1)
     rng2 = extract_range(relayout2)
     # Si el usuario movió 1 entonces sincroniza 2
-    if ctx.triggered_id == 'grafico-boyas-1' and rng1 is not None and show_second:
+    if ctx.triggered_id == 'grafico-columnaagua-1' and rng1 is not None and show_second:
         fig2 = apply_range(fig2, rng1)
     # Si el usuario movió 2 entonces sincroniza 1
-    if ctx.triggered_id == 'grafico-boyas-2' and rng2 is not None:
+    if ctx.triggered_id == 'grafico-columnaagua-2' and rng2 is not None:
         fig1 = apply_range(fig1, rng2)
 
     # --- 5) Mantener siempre uirevision (evita “rebotes” del slider/zoom) ---
