@@ -1,6 +1,8 @@
 # nereidas-dash
 
-Este repositorio contiene el código para reproducir el ejemplo de uso mostrado en el catálogo del proyecto NEREIDAS.
+Este repositorio contiene el código para reproducir el ejemplo de uso mostrado en el catálogo del proyecto NEREIDAS. 
+
+Los datos utilizados en este visor proceden de la Universidad Politécnica de Cartagena (UPCT), en https://marmenor.upct.es/embed/l2, y del Instituto Murciano de Investigación y Desarrollo Agrario y Medioambiental (IMIDA) en https://idearm.imida.es/cgi/siomctdmarmenor/.
 
 ## `LecturaDatos.ipynb`
 
